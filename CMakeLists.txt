@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-project(MiniDB)
+project(PaneerDB)
 
 set(PROJECT_SOURCES
 	src/main.cc
