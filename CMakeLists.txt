@@ -8,10 +8,16 @@ set(PROJECT_SOURCES
     src/Repl/Repl.cc
     src/token.cc
     src/QueryParser.cc
+    src/Expression.cc
+
     src/parsers/StatementParser.cc
     src/parsers/SelectStatementParser.cc
+    src/parsers/CreateDatabaseStatementParser.cc
+    src/parsers/UseDatabaseStatementParser.cc
+
     src/statements/SelectStatement.cc
-    src/Expression.cc
+    src/statements/CreateDatabaseStatement.cc
+    src/statements/UseDatabaseStatement.cc
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

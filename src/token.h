@@ -9,6 +9,9 @@ enum class TokenType {
   WHERE,
   OR,
   AND,
+  CREATE,
+  USE,
+  DATABASE,
 
   IDENTIFIER,
   STRING_LITERAL,

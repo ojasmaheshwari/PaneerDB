@@ -2,6 +2,8 @@
 #include <Expression.h>
 #include <token.h>
 #include <parsers/SelectStatementParser.h>
+#include <parsers/CreateDatabaseStatementParser.h>
+#include <parsers/UseDatabaseStatementParser.h>
 #include <cassert>
 #include <cctype>
 #include <cstddef>
@@ -58,6 +60,12 @@ void QueryParser::tokenize(const std::string &query) {
         m_Tokens.emplace_back("OR", TokenType::OR);
       } else if (word == "AND") {
         m_Tokens.emplace_back("AND", TokenType::AND);
+      } else if (word == "CREATE") {
+        m_Tokens.emplace_back("CREATE", TokenType::CREATE);
+      } else if (word == "USE") {
+        m_Tokens.emplace_back("USE", TokenType::USE);
+      } else if (word == "DATABASE") {
+        m_Tokens.emplace_back("DATABASE", TokenType::DATABASE);
       } else {
         m_Tokens.emplace_back(word, TokenType::IDENTIFIER);
       }
@@ -113,34 +121,27 @@ void QueryParser::tokenize(const std::string &query) {
   }
 }
 
-const Token &QueryParser::consume(TokenType type) {
-  assert(m_TokenPos < m_Tokens.size());
-
-  const Token &token = m_Tokens[m_TokenPos];
-
-  if (token.type != type) {
-    throw std::runtime_error(
-        "[Parser] Expected and actual token types do not match.\n \
-            Expected: " +
-        token.getTypeName(type) + '\n' + "Got: " + token.getTypeName());
-  }
-
-  ++m_TokenPos;
-
-  return token;
-}
-
-QueryParser::ParseResult QueryParser::parse() {
+Statement* QueryParser::parse() {
   if (m_Tokens.empty()) {
     throw new std::runtime_error("[Parser] Nothing to parse");
   }
 
   Token &firstToken = m_Tokens[0];
 
-  if (m_Tokens[0].type == TokenType::SELECT) {
+    if (m_Tokens[0].type == TokenType::SELECT) {
       SelectStatementParser parser(m_Tokens);
       return parser.parse();
-  }
+    }
+
+    if (m_Tokens[0].type == TokenType::CREATE) {
+      CreateDatabaseStatementParser parser(m_Tokens);
+      return parser.parse();
+    }
+
+    if (m_Tokens[0].type == TokenType::USE) {
+      UseDatabaseStatementParser parser(m_Tokens);
+      return parser.parse();
+    }
 
   throw std::runtime_error("[Parser] Invalid or unsupported query type - " +
                            firstToken.value);

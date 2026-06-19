@@ -5,6 +5,7 @@
 #include <Expression.h>
 #include <token.h>
 #include <parsers/StatementParser.h>
+#include <statements/SelectStatement.h>
 #include <string>
 #include <vector>
 #include <statements/SelectStatement.h>
@@ -14,7 +15,7 @@ public:
 	explicit SelectStatementParser(std::vector<Token> &tokens);
 	~SelectStatementParser() override = default;
 
-	SelectStatement parse();
+	SelectStatement* parse();
 
 private:
 	std::vector<std::string> parseProjection();

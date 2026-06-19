@@ -2,6 +2,8 @@
 #define QUERY_PARSER_H
 
 #include <statements/SelectStatement.h>
+#include <statements/CreateDatabaseStatement.h>
+#include <statements/UseDatabaseStatement.h>
 #include <Expression.h>
 #include <token.h>
 #include <cstddef>
@@ -16,15 +18,11 @@ public:
 
   void tokenize(const std::string &query);
 
-  typedef std::variant<SelectStatement> ParseResult;
-
-  ParseResult parse();
+  Statement *parse();
 
 private:
   size_t m_TokenPos;
   std::vector<Token> m_Tokens;
-
-  const Token &consume(TokenType type);
 };
 
 #endif

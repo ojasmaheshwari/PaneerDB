@@ -8,16 +8,15 @@ int main() {
   std::cout << "Made by Ojas Maheshwari\n\n";
 
   Repl repl("PaneerDB");
-  QueryParser queryParser;
 
   while (repl.running()) {
     auto input = repl.input();
+
+    QueryParser queryParser;
     queryParser.tokenize(input);
 
     auto parseResult = queryParser.parse();
-    if (auto* str = std::get_if<SelectStatement>(&parseResult)) {
-      (*str).print();
-    }
+    parseResult->print();
 
     if (input == "exit") {
       repl.exit();

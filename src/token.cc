@@ -20,6 +20,15 @@ std::string Token::getTypeName() const {
   case TokenType::AND:
     return "AND";
 
+  case TokenType::CREATE:
+    return "CREATE";
+
+  case TokenType::USE:
+    return "USE";
+
+  case TokenType::DATABASE:
+    return "DATABASE";
+
   case TokenType::IDENTIFIER:
     return "IDENTIFIER";
 
@@ -68,6 +77,15 @@ std::string Token::getTypeName(TokenType typeA) const {
 
   case TokenType::AND:
     return "AND";
+
+  case TokenType::CREATE:
+    return "CREATE";
+
+  case TokenType::USE:
+    return "USE";
+
+  case TokenType::DATABASE:
+    return "DATABASE";
 
   case TokenType::IDENTIFIER:
     return "IDENTIFIER";

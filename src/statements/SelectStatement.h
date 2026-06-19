@@ -3,14 +3,15 @@
 
 #include <vector>
 #include <string>
-#include "Expression.h"
+#include <statements/Statement.h>
+#include <Expression.h>
 
-class SelectStatement {
+class SelectStatement : public Statement {
 public:
   SelectStatement(std::vector<std::string> projectionA,
                   std::string tableNameA, Expression *filterA);
 
-  void print() const;
+  void print() const override;
 
   std::vector<std::string> projection;
   std::string tableName;

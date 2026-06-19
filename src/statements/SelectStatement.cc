@@ -3,7 +3,8 @@
 
 SelectStatement::SelectStatement(std::vector<std::string> projectionA,
                                  std::string tableNameA, Expression *filterA)
-    : projection(std::move(projectionA)), tableName(std::move(tableNameA)),
+    : Statement(Statement::StatementType::SELECT),
+      projection(std::move(projectionA)), tableName(std::move(tableNameA)),
       filter(filterA) {}
 
 void SelectStatement::print() const {

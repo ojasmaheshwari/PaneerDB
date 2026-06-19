@@ -6,7 +6,7 @@
 SelectStatementParser::SelectStatementParser(std::vector<Token> &tokens)
     : StatementParser(tokens) {}
 
-SelectStatement SelectStatementParser::parse() {
+SelectStatement* SelectStatementParser::parse() {
   // Expect SELECT
   consume(TokenType::SELECT);
 
@@ -25,7 +25,7 @@ SelectStatement SelectStatementParser::parse() {
     ++m_Pos;
   }
 
-  return SelectStatement(std::move(projection), std::move(tableName), filter);
+  return new SelectStatement(std::move(projection), std::move(tableName), filter);
 }
 
 std::vector<std::string> SelectStatementParser::parseProjection() {
