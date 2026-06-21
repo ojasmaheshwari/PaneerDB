@@ -14,10 +14,12 @@ set(PROJECT_SOURCES
     src/parsers/SelectStatementParser.cc
     src/parsers/CreateDatabaseStatementParser.cc
     src/parsers/UseDatabaseStatementParser.cc
+    src/parsers/InsertStatementParser.cc
 
     src/statements/SelectStatement.cc
     src/statements/CreateDatabaseStatement.cc
     src/statements/UseDatabaseStatement.cc
+    src/statements/InsertStatement.cc
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
