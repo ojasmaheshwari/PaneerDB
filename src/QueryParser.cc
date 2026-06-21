@@ -4,6 +4,7 @@
 #include <parsers/SelectStatementParser.h>
 #include <parsers/CreateDatabaseStatementParser.h>
 #include <parsers/UseDatabaseStatementParser.h>
+#include <parsers/InsertStatementParser.h>
 #include <cassert>
 #include <cctype>
 #include <cstddef>
@@ -66,6 +67,12 @@ void QueryParser::tokenize(const std::string &query) {
         m_Tokens.emplace_back("USE", TokenType::USE);
       } else if (word == "DATABASE") {
         m_Tokens.emplace_back("DATABASE", TokenType::DATABASE);
+      } else if (word == "INSERT") {
+        m_Tokens.emplace_back("INSERT", TokenType::INSERT);
+      } else if (word == "INTO") {
+        m_Tokens.emplace_back("INTO", TokenType::INTO);
+      } else if (word == "VALUES") {
+        m_Tokens.emplace_back("VALUES", TokenType::VALUES);
       } else {
         m_Tokens.emplace_back(word, TokenType::IDENTIFIER);
       }
@@ -103,6 +110,7 @@ void QueryParser::tokenize(const std::string &query) {
         ++i;
       } else if (c == ',') {
         m_Tokens.emplace_back(",", TokenType::COMMA);
+        ++i;
       } else if (c == ';') {
         m_Tokens.emplace_back(";", TokenType::END);
         break;
@@ -140,6 +148,11 @@ Statement* QueryParser::parse() {
 
     if (m_Tokens[0].type == TokenType::USE) {
       UseDatabaseStatementParser parser(m_Tokens);
+      return parser.parse();
+    }
+
+    if (m_Tokens[0].type == TokenType::INSERT) {
+      InsertStatementParser parser(m_Tokens);
       return parser.parse();
     }
 
