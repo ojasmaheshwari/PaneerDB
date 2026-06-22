@@ -2,27 +2,18 @@
 #define CREATE_TABLE_STATEMENT_H
 
 #include <statements/Statement.h>
+#include <statements/Column.h>
 #include <string>
-#include <vector>
-
-enum class ColumnType { INTEGER, VARCHAR };
-
-struct ColumnDefinition {
-  std::string name;
-  ColumnType type;
-  int varcharLength = 0; // only meaningful for VARCHAR
-  bool primaryKey = false;
-  bool notNull = false;
-  bool unique = false;
-};
+#include <map>
 
 class CreateTableStatement : public Statement {
 public:
-  CreateTableStatement(std::string tableNameA, std::vector<ColumnDefinition> columnsA);
+  CreateTableStatement(std::string tableNameA, std::map<std::string, Column*> columnsA);
+  ~CreateTableStatement() override;
   void print() const override;
 
   std::string tableName;
-  std::vector<ColumnDefinition> columns;
+  std::map<std::string, Column*> columns;
 };
 
 #endif

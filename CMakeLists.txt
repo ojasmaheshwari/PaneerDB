@@ -20,6 +20,7 @@ set(PROJECT_SOURCES
     src/statements/CreateDatabaseStatement.cc
     src/statements/CreateTableStatement.cc
     src/statements/UseDatabaseStatement.cc
+    src/statements/Column.cc
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

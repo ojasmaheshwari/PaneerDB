@@ -73,7 +73,7 @@ void QueryParser::tokenize(const std::string &query) {
         m_Tokens.emplace_back("DATABASE", TokenType::DATABASE);
       } else if (upperWord == "TABLE") {
         m_Tokens.emplace_back("TABLE", TokenType::TABLE);
-      } else if (upperWord == "INTEGER") {
+      } else if (upperWord == "INTEGER" || upperWord == "INT") {
         m_Tokens.emplace_back("INTEGER", TokenType::INTEGER);
       } else if (upperWord == "VARCHAR") {
         m_Tokens.emplace_back("VARCHAR", TokenType::VARCHAR);
@@ -136,6 +136,10 @@ void QueryParser::tokenize(const std::string &query) {
         throw std::runtime_error(error);
       }
     }
+  }
+
+  if (m_Tokens.empty()) {
+    throw std::runtime_error("[tokenizer] Empty query");
   }
 
   if (m_Tokens.back().type != TokenType::END) {

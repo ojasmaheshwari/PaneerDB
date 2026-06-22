@@ -3,6 +3,7 @@
 
 #include <parsers/StatementParser.h>
 #include <statements/CreateTableStatement.h>
+#include <statements/Column.h>
 #include <token.h>
 #include <string>
 #include <vector>
@@ -15,7 +16,7 @@ public:
   CreateTableStatement* parse();
 
 private:
-  ColumnDefinition parseColumnDefinition();
+  Column* parseColumnDefinition();
 };
 
 #endif

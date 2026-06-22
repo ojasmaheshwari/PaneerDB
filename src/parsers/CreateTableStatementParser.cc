@@ -1,10 +1,11 @@
 #include <parsers/CreateTableStatementParser.h>
 #include <stdexcept>
 
-CreateTableStatementParser::CreateTableStatementParser(std::vector<Token> &tokens)
+CreateTableStatementParser::CreateTableStatementParser(
+    std::vector<Token> &tokens)
     : StatementParser(tokens) {}
 
-CreateTableStatement* CreateTableStatementParser::parse() {
+CreateTableStatement *CreateTableStatementParser::parse() {
   consume(TokenType::CREATE);
   consume(TokenType::TABLE);
 
@@ -12,15 +13,17 @@ CreateTableStatement* CreateTableStatementParser::parse() {
 
   consume(TokenType::LPAREN);
 
-  std::vector<ColumnDefinition> columns;
-  columns.push_back(parseColumnDefinition());
+  std::map<std::string, Column *> columns;
+  Column *firstCol = parseColumnDefinition();
+  columns[firstCol->name] = firstCol;
 
   while (accept(TokenType::COMMA)) {
     // allow a trailing comma before the closing paren
     if (peek().type == TokenType::RPAREN) {
       break;
     }
-    columns.push_back(parseColumnDefinition());
+    Column *col = parseColumnDefinition();
+    columns[col->name] = col;
   }
 
   consume(TokenType::RPAREN);
@@ -32,45 +35,52 @@ CreateTableStatement* CreateTableStatementParser::parse() {
   return new CreateTableStatement(std::move(name), std::move(columns));
 }
 
-ColumnDefinition CreateTableStatementParser::parseColumnDefinition() {
-  ColumnDefinition col;
-  col.name = consume(TokenType::IDENTIFIER).value;
+Column *CreateTableStatementParser::parseColumnDefinition() {
+  std::string colName = consume(TokenType::IDENTIFIER).value;
+  ColumnType type;
+  int varcharLength = 0;
 
   if (accept(TokenType::INTEGER)) {
-    col.type = ColumnType::INTEGER;
+    type = ColumnType::INTEGER;
   } else if (accept(TokenType::VARCHAR)) {
-    col.type = ColumnType::VARCHAR;
+    type = ColumnType::VARCHAR;
 
     consume(TokenType::LPAREN);
     std::string lenStr = consume(TokenType::NUMERIC_LITERAL).value;
 
     try {
-      col.varcharLength = std::stoi(lenStr);
+      varcharLength = std::stoi(lenStr);
     } catch (...) {
       throw std::runtime_error("[CreateTableParser] Invalid VARCHAR length");
     }
 
     consume(TokenType::RPAREN);
   } else {
-    throw std::runtime_error(
-        "[CreateTableParser] Expected data type (INTEGER or VARCHAR) for column '" +
-        col.name + "'");
+    throw std::runtime_error("[CreateTableParser] Expected data type (INTEGER "
+                             "or VARCHAR) for column '" +
+                             colName + "'");
   }
+
+  bool pk = false, nn = false, uq = false;
 
   // Column constraints, in any order, any combination
   while (true) {
     if (accept(TokenType::PRIMARY)) {
       consume(TokenType::KEY);
-      col.primaryKey = true;
+      pk = true;
     } else if (accept(TokenType::NOT)) {
       consume(TokenType::NULL_KW);
-      col.notNull = true;
+      nn = true;
     } else if (accept(TokenType::UNIQUE)) {
-      col.unique = true;
+      uq = true;
     } else {
       break;
     }
   }
 
-  return col;
+  if (type == ColumnType::INTEGER) {
+    return new IntegerColumn(colName, pk, nn, uq);
+  } else {
+    return new VarcharColumn(colName, varcharLength, pk, nn, uq);
+  }
 }
