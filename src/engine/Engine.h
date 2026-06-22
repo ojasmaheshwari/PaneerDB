@@ -10,6 +10,7 @@ public:
     Engine();
 
     void useDatabase(const std::string& name);
+    void createDatabase(const std::string& name);
     void execute(Statement* statement);
     bool isDbActive() const;
     std::string getActiveDatabase() const;
