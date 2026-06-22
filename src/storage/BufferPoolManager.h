@@ -35,6 +35,8 @@ public:
   // Flushes all the pages in the buffer pool to disk.
   void flushAllPages();
 
+  inline DiskManager* getDiskManager() const { return diskManager; }
+
 private:
   size_t poolSize;
   Page *pages;

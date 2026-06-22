@@ -4,16 +4,16 @@
 #include <statements/Statement.h>
 #include <statements/Column.h>
 #include <string>
-#include <map>
+#include <vector>
 
 class CreateTableStatement : public Statement {
 public:
-  CreateTableStatement(std::string tableNameA, std::map<std::string, Column*> columnsA);
+  CreateTableStatement(std::string tableNameA, std::vector<Column*> columnsA);
   ~CreateTableStatement() override;
   void print() const override;
 
   std::string tableName;
-  std::map<std::string, Column*> columns;
+  std::vector<Column*> columns;
 };
 
 #endif

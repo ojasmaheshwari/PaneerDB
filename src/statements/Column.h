@@ -17,18 +17,23 @@ public:
   bool unique;
 
   virtual void print() const = 0;
+  virtual std::string serialize() const = 0;
+  
+  static Column* deserialize(const std::string& data, size_t& offset);
 };
 
 class IntegerColumn : public Column {
 public:
   IntegerColumn(std::string nameA, bool primaryKeyA, bool notNullA, bool uniqueA);
   void print() const override;
+  std::string serialize() const override;
 };
 
 class VarcharColumn : public Column {
 public:
   VarcharColumn(std::string nameA, int lengthA, bool primaryKeyA, bool notNullA, bool uniqueA);
   void print() const override;
+  std::string serialize() const override;
 
   int varcharLength;
 };

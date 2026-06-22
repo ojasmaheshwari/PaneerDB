@@ -13,9 +13,9 @@ CreateTableStatement *CreateTableStatementParser::parse() {
 
   consume(TokenType::LPAREN);
 
-  std::map<std::string, Column *> columns;
+  std::vector<Column *> columns;
   Column *firstCol = parseColumnDefinition();
-  columns[firstCol->name] = firstCol;
+  columns.push_back(firstCol);
 
   while (accept(TokenType::COMMA)) {
     // allow a trailing comma before the closing paren
@@ -23,7 +23,7 @@ CreateTableStatement *CreateTableStatementParser::parse() {
       break;
     }
     Column *col = parseColumnDefinition();
-    columns[col->name] = col;
+    columns.push_back(col);
   }
 
   consume(TokenType::RPAREN);

@@ -16,6 +16,7 @@ public:
     void readPage(page_id_t pageId, char* pageData);
     void writePage(page_id_t pageId, const char* pageData);
     page_id_t allocatePage();
+    inline page_id_t getNextPageId() const { return nextPageId; }
 
 private:
     std::string fileName;

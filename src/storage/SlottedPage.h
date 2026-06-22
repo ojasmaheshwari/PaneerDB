@@ -43,6 +43,8 @@ public:
     // Gets the amount of contiguous free space in the middle of the page
     uint16_t getFreeSpace() const;
 
+    uint16_t getSlotCount() const;
+
 private:
     Page* page_;
     char* data_;
@@ -50,7 +52,6 @@ private:
     uint16_t getFreeSpacePointer() const;
     void setFreeSpacePointer(uint16_t ptr);
     
-    uint16_t getSlotCount() const;
     void setSlotCount(uint16_t count);
 
     Slot getSlot(slot_id_t slotId) const;
