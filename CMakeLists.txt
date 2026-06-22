@@ -13,10 +13,12 @@ set(PROJECT_SOURCES
     src/parsers/StatementParser.cc
     src/parsers/SelectStatementParser.cc
     src/parsers/CreateDatabaseStatementParser.cc
+    src/parsers/CreateTableStatementParser.cc
     src/parsers/UseDatabaseStatementParser.cc
 
     src/statements/SelectStatement.cc
     src/statements/CreateDatabaseStatement.cc
+    src/statements/CreateTableStatement.cc
     src/statements/UseDatabaseStatement.cc
 )
 

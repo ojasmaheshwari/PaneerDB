@@ -3,8 +3,10 @@
 Token::Token(const std::string &valueA, TokenType typeA)
     : value(valueA), type(typeA) {}
 
-std::string Token::getTypeName() const {
-  switch (type) {
+std::string Token::getTypeName() const
+{
+  switch (type)
+  {
   case TokenType::SELECT:
     return "SELECT";
 
@@ -28,6 +30,9 @@ std::string Token::getTypeName() const {
 
   case TokenType::DATABASE:
     return "DATABASE";
+
+  case TokenType::TABLE:
+    return "TABLE";
 
   case TokenType::IDENTIFIER:
     return "IDENTIFIER";
@@ -61,8 +66,10 @@ std::string Token::getTypeName() const {
   }
 }
 
-std::string Token::getTypeName(TokenType typeA) const {
-  switch (typeA) {
+std::string Token::getTypeName(TokenType typeA) const
+{
+  switch (typeA)
+  {
   case TokenType::SELECT:
     return "SELECT";
 
@@ -81,11 +88,35 @@ std::string Token::getTypeName(TokenType typeA) const {
   case TokenType::CREATE:
     return "CREATE";
 
+  case TokenType::TABLE:
+    return "TABLE";
+
   case TokenType::USE:
     return "USE";
 
   case TokenType::DATABASE:
     return "DATABASE";
+
+  case TokenType::INTEGER:
+    return "INTEGER";
+
+  case TokenType::VARCHAR:
+    return "VARCHAR";
+
+  case TokenType::PRIMARY:
+    return "PRIMARY";
+
+  case TokenType::KEY:
+    return "KEY";
+
+  case TokenType::NOT:
+    return "NOT";
+
+  case TokenType::NULL_KW:
+    return "NULL";
+
+  case TokenType::UNIQUE:
+    return "UNIQUE";
 
   case TokenType::IDENTIFIER:
     return "IDENTIFIER";

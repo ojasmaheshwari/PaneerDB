@@ -4,6 +4,7 @@
 #include <parsers/SelectStatementParser.h>
 #include <parsers/CreateDatabaseStatementParser.h>
 #include <parsers/UseDatabaseStatementParser.h>
+#include <parsers/CreateTableStatementParser.h>
 #include <cassert>
 #include <cctype>
 #include <cstddef>
@@ -66,6 +67,22 @@ void QueryParser::tokenize(const std::string &query) {
         m_Tokens.emplace_back("USE", TokenType::USE);
       } else if (word == "DATABASE") {
         m_Tokens.emplace_back("DATABASE", TokenType::DATABASE);
+      } else if (word == "TABLE") {
+        m_Tokens.emplace_back("TABLE", TokenType::TABLE);
+      } else if (word == "INTEGER") {
+        m_Tokens.emplace_back("INTEGER", TokenType::INTEGER);
+      } else if (word == "VARCHAR") {
+        m_Tokens.emplace_back("VARCHAR", TokenType::VARCHAR);
+      } else if (word == "PRIMARY") {
+        m_Tokens.emplace_back("PRIMARY", TokenType::PRIMARY);
+      } else if (word == "KEY") {
+        m_Tokens.emplace_back("KEY", TokenType::KEY);
+      } else if (word == "NOT") {
+        m_Tokens.emplace_back("NOT", TokenType::NOT);
+      } else if (word == "NULL") {
+        m_Tokens.emplace_back("NULL", TokenType::NULL_KW);
+      } else if (word == "UNIQUE") {
+        m_Tokens.emplace_back("UNIQUE", TokenType::UNIQUE);
       } else {
         m_Tokens.emplace_back(word, TokenType::IDENTIFIER);
       }
@@ -103,6 +120,7 @@ void QueryParser::tokenize(const std::string &query) {
         ++i;
       } else if (c == ',') {
         m_Tokens.emplace_back(",", TokenType::COMMA);
+        ++i;
       } else if (c == ';') {
         m_Tokens.emplace_back(";", TokenType::END);
         break;
@@ -134,8 +152,15 @@ Statement* QueryParser::parse() {
     }
 
     if (m_Tokens[0].type == TokenType::CREATE) {
-      CreateDatabaseStatementParser parser(m_Tokens);
-      return parser.parse();
+      if (m_Tokens.size() > 1 && m_Tokens[1].type == TokenType::DATABASE) {
+        CreateDatabaseStatementParser parser(m_Tokens);
+        return parser.parse();
+      } else if (m_Tokens.size() > 1 && m_Tokens[1].type == TokenType::TABLE) {
+        CreateTableStatementParser parser(m_Tokens);
+        return parser.parse();
+      } else {
+        throw std::runtime_error("[Parser] Invalid CREATE statement - expected DATABASE or TABLE keyword");
+      }
     }
 
     if (m_Tokens[0].type == TokenType::USE) {
