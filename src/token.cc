@@ -76,6 +76,12 @@ std::string Token::getTypeName() const
   case TokenType::END:
     return "END";
 
+  case TokenType::SHOW:
+    return "SHOW";
+
+  case TokenType::TABLES:
+    return "TABLES";
+
   default:
     return "UNKNOWN";
   }
@@ -174,6 +180,12 @@ std::string Token::getTypeName(TokenType typeA) const
 
   case TokenType::END:
     return "END";
+
+  case TokenType::SHOW:
+    return "SHOW";
+
+  case TokenType::TABLES:
+    return "TABLES";
 
   default:
     return "UNKNOWN";

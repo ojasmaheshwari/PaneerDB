@@ -3,7 +3,7 @@
 
 class Statement {
 public:
-  enum class StatementType { SELECT, CREATE_DATABASE, USE_DATABASE, UNKNOWN, CREATE_TABLE, INSERT, DOT_TABLES, DESCRIBE_TABLE };
+  enum class StatementType { SELECT, CREATE_DATABASE, USE_DATABASE, UNKNOWN, CREATE_TABLE, INSERT, SHOW_TABLES, DESCRIBE_TABLE };
 
   explicit Statement(StatementType typeA = StatementType::UNKNOWN) : m_type(typeA) {}
   virtual ~Statement() = default;

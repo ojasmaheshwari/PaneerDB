@@ -24,7 +24,7 @@ int main() {
 
     auto parseResult = queryParser.parse();
     if (parseResult) {
-      parseResult->print();
+      // parseResult->print();
 
       engine.execute(parseResult);
 

@@ -14,7 +14,8 @@
 #include <string>
 #include <token.h>
 #include <vector>
-#include "statements/DotTablesStatement.h"
+#include "statements/ShowTablesStatement.h"
+#include "parsers/ShowTablesStatementParser.h"
 #include "parsers/DescribeStatementParser.h"
 
 void QueryParser::tokenize(const std::string &query) {
@@ -74,6 +75,10 @@ void QueryParser::tokenize(const std::string &query) {
         m_Tokens.emplace_back("USE", TokenType::USE);
       } else if (upperWord == "DATABASE") {
         m_Tokens.emplace_back("DATABASE", TokenType::DATABASE);
+      } else if (upperWord == "SHOW") {
+        m_Tokens.emplace_back("SHOW", TokenType::SHOW);
+      } else if (upperWord == "TABLES") {
+        m_Tokens.emplace_back("TABLES", TokenType::TABLES);
       } else if (upperWord == "TABLE") {
         m_Tokens.emplace_back("TABLE", TokenType::TABLE);
       } else if (upperWord == "INSERT") {
@@ -142,17 +147,6 @@ void QueryParser::tokenize(const std::string &query) {
       } else if (c == '*') {
         m_Tokens.emplace_back("*", TokenType::STAR);
         ++i;
-      } else if (c == '.') {
-        std::string word;
-        while (i < query.size() && !isspace(query[i]) && query[i] != ';') {
-          word += query[i];
-          ++i;
-        }
-        if (word == ".tables") {
-          m_Tokens.emplace_back(".tables", TokenType::DOT_TABLES);
-        } else {
-          throw std::runtime_error("[tokenizer] Unrecognized dot command: " + word);
-        }
       } else {
         std::string error = "[tokenizer] Unrecognized symbol (" +
                             std::string(1, c) + ") CODE " +
@@ -207,8 +201,9 @@ Statement *QueryParser::parse() {
     return parser.parse();
   }
 
-  if (m_Tokens[0].type == TokenType::DOT_TABLES) {
-    return new DotTablesStatement();
+  if (m_Tokens[0].type == TokenType::SHOW) {
+    ShowTablesStatementParser parser(m_Tokens);
+    return parser.parse();
   }
 
   if (m_Tokens[0].type == TokenType::DESC) {
