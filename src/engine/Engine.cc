@@ -18,6 +18,8 @@
 #include <stdexcept>
 #include "concurrency/TransactionManager.h"
 #include "concurrency/LockManager.h"
+#include "storage/LogManager.h"
+#include "storage/LogRecord.h"
 
 Engine::Engine() : active(false), activeDbName("") {}
 Engine::~Engine() = default;
@@ -32,6 +34,7 @@ void Engine::useDatabase(const std::string &name) {
   catalog = std::make_unique<Catalog>(bpm.get());
   lockManager = std::make_unique<LockManager>();
   txnManager = std::make_unique<TransactionManager>(lockManager.get());
+  logManager = std::make_unique<LogManager>(activeDbName + ".log");
 }
 
 void Engine::createDatabase(const std::string &name) {
@@ -98,11 +101,14 @@ void Engine::execute(Statement *statement) {
     bool auto_commit = false;
     if (currentTxn == nullptr) {
       currentTxn = txnManager->Begin();
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::BEGIN));
       auto_commit = true;
     }
     auto insertStmt = static_cast<InsertStatement *>(statement);
     executeInsert(insertStmt);
     if (auto_commit) {
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::COMMIT));
+      logManager->Flush();
       txnManager->Commit(currentTxn);
       delete currentTxn;
       currentTxn = nullptr;
@@ -132,11 +138,14 @@ void Engine::execute(Statement *statement) {
     bool auto_commit = false;
     if (currentTxn == nullptr) {
       currentTxn = txnManager->Begin();
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::BEGIN));
       auto_commit = true;
     }
     auto selectStmt = static_cast<SelectStatement *>(statement);
     executeSelect(selectStmt);
     if (auto_commit) {
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::COMMIT));
+      logManager->Flush();
       txnManager->Commit(currentTxn);
       delete currentTxn;
       currentTxn = nullptr;
@@ -151,11 +160,14 @@ void Engine::execute(Statement *statement) {
     bool auto_commit = false;
     if (currentTxn == nullptr) {
       currentTxn = txnManager->Begin();
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::BEGIN));
       auto_commit = true;
     }
     auto deleteStmt = static_cast<DeleteStatement *>(statement);
     executeDelete(deleteStmt);
     if (auto_commit) {
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::COMMIT));
+      logManager->Flush();
       txnManager->Commit(currentTxn);
       delete currentTxn;
       currentTxn = nullptr;
@@ -172,6 +184,7 @@ void Engine::execute(Statement *statement) {
       break;
     }
     currentTxn = txnManager->Begin();
+    logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::BEGIN));
     std::cout << "Transaction started.\n";
     break;
   }
@@ -184,6 +197,8 @@ void Engine::execute(Statement *statement) {
       std::cerr << "Error: No active transaction.\n";
       break;
     }
+    logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::COMMIT));
+    logManager->Flush();
     txnManager->Commit(currentTxn);
     delete currentTxn;
     currentTxn = nullptr;
@@ -199,6 +214,8 @@ void Engine::execute(Statement *statement) {
       std::cerr << "Error: No active transaction.\n";
       break;
     }
+    logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::ABORT));
+    logManager->Flush();
     txnManager->Abort(currentTxn);
     delete currentTxn;
     currentTxn = nullptr;
@@ -332,6 +349,7 @@ void Engine::executeInsert(InsertStatement *stmt) {
     if (slotId >= 0) {
       // Successfully inserted
       updateIndexes(slotId, currentPageId);
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::INSERT, stmt->tableName, currentPageId, slotId, tupleData));
       bpm->unpinPage(currentPageId, true);
       std::cout << "Inserted 1 row into '" << stmt->tableName << "'.\n";
       return;
@@ -370,6 +388,7 @@ void Engine::executeInsert(InsertStatement *stmt) {
       }
 
       updateIndexes(slotId, newPageId);
+      logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::INSERT, stmt->tableName, newPageId, slotId, tupleData));
       bpm->unpinPage(newPageId, true);
       std::cout << "Inserted 1 row into '" << stmt->tableName
                 << "' (allocated new page " << newPageId << ").\n";
@@ -667,6 +686,7 @@ void Engine::executeDelete(DeleteStatement *stmt) {
       }
 
       if (matches) {
+        logManager->AppendLogRecord(LogRecord(currentTxn->GetTransactionId(), LogRecordType::DELETE, stmt->tableName, pageId, slotId, tupleData));
         sp.deleteTuple(slotId);
         deletedCount++;
         

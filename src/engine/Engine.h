@@ -35,6 +35,7 @@ private:
     
     std::unique_ptr<class LockManager> lockManager;
     std::unique_ptr<class TransactionManager> txnManager;
+    std::unique_ptr<class LogManager> logManager;
     class Transaction* currentTxn = nullptr;
 };
 
